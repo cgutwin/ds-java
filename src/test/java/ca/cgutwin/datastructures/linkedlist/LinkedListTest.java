@@ -37,7 +37,7 @@ class LinkedListTest {
         list.append("baz");
 
         // Check that the list size and contents are as expected
-        assertEquals(3, list.size());
+        Assertions.assertEquals(3, list.size());
 
         assertEquals("foo", list.get(0));
         assertEquals("bar", list.get(1));
@@ -53,6 +53,21 @@ class LinkedListTest {
 
         // Search for an existing value
         int index = list.search("bar");
+
+        // Check that the index is as expected
+        assertEquals(1, index);
+    }
+
+    @Test
+    @DisplayName("Inserting an item at an index should place the item properly")
+    void insertAt() {
+        list.append("foo");
+        list.append("bar");
+        list.append("baz");
+
+        // Search for an existing value
+        list.insert("qux", 1);
+        int index = list.search("qux");
 
         // Check that the index is as expected
         assertEquals(1, index);

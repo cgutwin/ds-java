@@ -1,4 +1,4 @@
-package ca.cgutwin.datastructures.stack;
+package ca.cgutwin.datastructures.stacks;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class VectorStackTest {
-    ca.cgutwin.datastructures.stack.VectorStack<String> stack;
+    VectorStack<String> stack;
 
     @BeforeEach
     void setUp() {

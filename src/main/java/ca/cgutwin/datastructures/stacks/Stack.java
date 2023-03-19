@@ -1,4 +1,4 @@
-package ca.cgutwin.datastructures.stack;
+package ca.cgutwin.datastructures.stacks;
 
 interface Stack<T> {
     /**

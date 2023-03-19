@@ -28,6 +28,48 @@ public class LinkedList<T> {
         size++;
     }
 
+    public void insert(T data, int index) {
+        if (index >= size()) throw new IndexOutOfBoundsException("Index is larger than the list.");
+
+        if (index == size()) append(data);
+        else if (index == 0) prepend(data);
+        else {
+            ListNode<T> toInsert = new ListNode<>(data);
+            ListNode<T> current = head;
+
+            for (int i = 1; i < size(); i++) {
+                if (i == index) {
+                    toInsert.setNext(current.getNext());
+                    current.setNext(toInsert);
+                    break;
+                }
+                current = current.getNext();
+            }
+        }
+
+        size++;
+    }
+
+    public void delete(T data) {
+        if (head == null) throw new NoSuchElementException("List is empty");
+
+        if (head.getData() == data) head = null;
+        else {
+            ListNode<T> current = head;
+            while (current.getNext() != null) {
+                if (current.getNext().getData() == data) {
+                    ListNode<T> second = current.getNext();
+                    ListNode<T> third = second.getNext();
+
+                    second.setNext(null);
+                    current.setNext(third);
+                }
+            }
+        }
+
+        size--;
+    }
+
     public T get(int index) {
         if (head == null) throw new NoSuchElementException("List is empty");
         if (index == 0) return head.getData();
@@ -48,8 +90,9 @@ public class LinkedList<T> {
         boolean found = false;
 
         ListNode<T> current = head;
+
         int index = 0;
-        while (index < size() && !found) {
+        while (current != null && !found) {
             if (current.getData() == value) found = true;
             else {
                 current = current.getNext();
