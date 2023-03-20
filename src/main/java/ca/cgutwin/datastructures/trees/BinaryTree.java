@@ -1,15 +1,15 @@
 package ca.cgutwin.datastructures.trees;
 
 public interface BinaryTree<T> {
-    public void insert(T data);
+    Node<T> insert(T data);
 
-    public void remove(T data);
+    void remove(T data);
 
-    public boolean contains(T data);
+    boolean contains(T data);
 
-    public int size();
+    int size();
 
-    public int height();
+    int height();
 
 //    public Iterator<T> iterator();
 }

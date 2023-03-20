@@ -1,81 +1,38 @@
 package ca.cgutwin.datastructures.trees;
 
 public abstract class AbstractBinarySearchTree<T extends Comparable<T>> implements BinaryTree<T> {
-    protected static class Node<T> {
-        private T value;
-        private Node<T> left;
-        private Node<T> right;
-        private Node<T> parent;
-
-        public Node(T value, Node<T> left, Node<T> right, Node<T> parent) {
-            this.value = value;
-            this.left = left;
-            this.right = right;
-            this.parent = parent;
-        }
-
-        public Node(T value) {
-            this.value = value;
-        }
-
-        public T getValue() {
-            return value;
-        }
-
-        public void setValue(T value) {
-            this.value = value;
-        }
-
-        public Node<T> getLeft() {
-            return left;
-        }
-
-        public void setLeft(Node<T> left) {
-            this.left = left;
-        }
-
-        public Node<T> getRight() {
-            return right;
-        }
-
-        public void setRight(Node<T> right) {
-            this.right = right;
-        }
-
-        public Node<T> getParent() {
-            return parent;
-        }
-
-        public void setParent(Node<T> parent) {
-            this.parent = parent;
-        }
-
-        public boolean isLeaf() {
-            return left == null && right == null;
-        }
-    }
 
     protected int size;
-    protected Node<T> root;
+    public Node<T> root;
+
+    protected abstract Node<T> newNode(T value, Node<T> left, Node<T> right, Node<T> parent);
 
     @Override
-    public void insert(T data) {
-//        if (data == null) throw new IllegalArgumentException("");
-        if (data == null) return;
-
-        root = insert(root, null, data);
+    public Node<T> insert(T data) {
+        return insert(root, null, data);
     }
 
     private Node<T> insert(Node<T> node, Node<T> parent, T data) {
-        if (node == null) {
+        if (root == null) {
+            root = newNode(data, null, null, null);
             size++;
-            return new Node<>(data, null, null, parent);
+            return root;
         }
 
-        int c = data.compareTo(node.value);
-        if (c < 0) node.left = insert(node.left, node, data);
-        else if (c > 0) node.right = insert(node.right, node, data);
-        else node.value = data;
+        if (node == null) {
+            Node<T> toInsert = newNode(data, null, null, parent);
+            if (data.compareTo(parent.getValue()) < 0) parent.setLeft(toInsert);
+            else parent.setRight(toInsert);
+
+            size++;
+
+            return toInsert;
+        }
+
+        int c = data.compareTo(node.getValue());
+        if (c < 0) return insert(node.getLeft(), node, data);
+        else if (c > 0) return insert(node.getRight(), node, data);
+        else node.setValue(data);
 
         return node;
     }
@@ -89,33 +46,33 @@ public abstract class AbstractBinarySearchTree<T extends Comparable<T>> implemen
     private Node<T> remove(Node<T> node, Node<T> parent, T data) {
         if (node == null) return null;
 
-        int c = data.compareTo(node.value);
-        if (c < 0) node.left = remove(node.left, node, data);
-        else if (c > 0) node.right = remove(node.right, node, data);
+        int c = data.compareTo(node.getValue());
+        if (c < 0) node.setLeft(remove(node.getLeft(), node, data));
+        else if (c > 0) node.setRight(remove(node.getRight(), node, data));
         else {
-            if (node.right == null) {
-                if (parent == null) root = node.left;
-                else if (node == parent.left) parent.right = node.left;
-                else parent.left = node.left;
+            if (node.getRight() == null) {
+                if (parent == null) root = node.getLeft();
+                else if (node == parent.getLeft()) parent.setRight(node.getLeft());
+                else parent.setLeft(node.getLeft());
 
                 size--;
-                return node.left;
+                return node.getLeft();
             }
-            if (node.left == null) {
-                if (parent == null) root = node.right;
-                else if (node == parent.left) parent.left = node.right;
-                else parent.right = node.right;
+            if (node.getLeft() == null) {
+                if (parent == null) root = node.getRight();
+                else if (node == parent.getLeft()) parent.setLeft(node.getRight());
+                else parent.setRight(node.getRight());
 
                 size--;
-                return node.right;
+                return node.getRight();
             }
 
             Node<T> t = node;
-            node = min(t.right);
-            node.right = removeMin(t.right);
-            node.left = t.left;
-            node.left.parent = node;
-            node.parent = t.parent;
+            node = min(t.getRight());
+            node.setRight(removeMin(t.getRight()));
+            node.setLeft(t.getLeft());
+            node.getLeft().setParent(node);
+            node.setParent(t.getParent());
             size--;
         }
 
@@ -123,8 +80,8 @@ public abstract class AbstractBinarySearchTree<T extends Comparable<T>> implemen
     }
 
     private Node<T> removeMin(Node<T> node) {
-        if (node.left == null) return node.right;
-        node.left = removeMin(node.left);
+        if (node.getLeft() == null) return node.getRight();
+        node.setLeft(removeMin(node.getLeft()));
         size--;
         return node;
     }
@@ -137,9 +94,9 @@ public abstract class AbstractBinarySearchTree<T extends Comparable<T>> implemen
     private boolean contains(Node<T> node, T data) {
         if (node == null) return false;
 
-        int c = data.compareTo(node.value);
-        if (c < 0) return contains(node.left, node.value);
-        else if (c > 0) return contains(node.right, node.value);
+        int c = data.compareTo(node.getValue());
+        if (c < 0) return contains(node.getLeft(), node.getValue());
+        else if (c > 0) return contains(node.getRight(), node.getValue());
 
         return true;
     }
@@ -154,19 +111,19 @@ public abstract class AbstractBinarySearchTree<T extends Comparable<T>> implemen
         return height(root);
     }
 
-    private int height(Node<T> node) {
+    public int height(Node<T> node) {
         if (node == null) {
             return 0;
         }
 
-        int leftHeight = height(node.left);
-        int rightHeight = height(node.right);
+        int leftHeight = height(node.getLeft());
+        int rightHeight = height(node.getRight());
 
         return Math.max(leftHeight, rightHeight) + 1;
     }
 
     private Node<T> min(Node<T> node) {
-        if (node.left == null) return node;
-        return min(node.left);
+        if (node.getLeft() == null) return node;
+        return min(node.getLeft());
     }
 }
